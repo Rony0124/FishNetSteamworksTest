@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using FishNet.Managing;
+using FishNet.Transporting;
 using HeathenEngineering.SteamworksIntegration;
 using HeathenEngineering.SteamworksIntegration.API;
 using Steamworks;
@@ -15,8 +17,6 @@ public class test : MonoBehaviour
     [SerializeField] private NetworkManager _networkManager;
     [SerializeField] private FishySteamworks.FishySteamworks _fishySteamworks;
     
-    
-    
     protected Callback<LobbyCreated_t> LobbyCreated;
     protected Callback<GameLobbyJoinRequested_t> JoinRequest;
     protected Callback<LobbyEnter_t> LobbyEntered;
@@ -25,15 +25,25 @@ public class test : MonoBehaviour
     
     private ISteamMatchmakingServerListResponse m_ServerListResponse;
     
-    public static ulong CurrentLobbyID;
+    private Steamworks.Callback<SteamNetConnectionStatusChangedCallback_t> _onRemoteConnectionStateCallback;
     
+    public static ulong CurrentLobbyID;
+    public SteamSettings settings;
     public void OnSteamInit()
     {
-        Debug.Log("Steam init");
+        var steamID = SteamGameServer.GetSteamID();
+        
+        Debug.Log("Steam Server Id" + steamID.m_SteamID);
     }
     
     private void Start()
     {
+        // SteamAPI.Init();
+        //
+        // var serverConfiguration = settings.server.Configuration;
+        // Steamworks.GameServer.Init(serverConfiguration.ip, serverConfiguration.gamePort, serverConfiguration.queryPort, EServerMode.eServerModeAuthentication, serverConfiguration.serverVersion);
+        // SteamGameServer.LogOnAnonymous();
+        
         LobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequest = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
         LobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
@@ -41,6 +51,9 @@ public class test : MonoBehaviour
         m_ServerListRequest = HServerListRequest.Invalid;
         
         m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
+        
+       
+
     }
     
     private void OnLobbyCreated(LobbyCreated_t callback)
@@ -69,8 +82,6 @@ public class test : MonoBehaviour
     {
         CurrentLobbyID = callback.m_ulSteamIDLobby;
         
-        //MainMenuManager.LobbyEntered(SteamMatchmaking.GetLobbyData(new CSteamID(CurrentLobbyID), "name"), _networkManager.IsServer);
-        
         Debug.Log("successfully lobby entered");
         
         Debug.Log("Host Address" + SteamUser.GetSteamID().ToString());
@@ -80,25 +91,39 @@ public class test : MonoBehaviour
         _fishySteamworks.StartConnection(false);
     }
     
-    public static void CreateLobby()
+    public void CreateLobby()
     {
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, 4);
-      
+        //SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, 4);
+        //_fishySteamworks.SetClientAddress(SteamMatchmaking.GetLobbyData(new CSteamID(CurrentLobbyID), "HostAddress"));
+        _fishySteamworks.StartConnection(true);
     }
 
     public void JoinByID(string id)
     {
-        CSteamID steamID = new CSteamID(Convert.ToUInt64(id));
-        JoinByID(steamID);
+        _fishySteamworks.SetClientAddress(id);
+        _fishySteamworks.StartConnection(false);
+        
+        // CSteamID steamID = new CSteamID(Convert.ToUInt64(id));
+        // JoinByID(steamID);
     }
     
-    public static void JoinByID(CSteamID steamID)
+    public void JoinByID(CSteamID steamID)
     {
-        Debug.Log("Attempting to join lobby with ID: " + steamID.m_SteamID);
-        if (SteamMatchmaking.RequestLobbyData(steamID))
-            SteamMatchmaking.JoinLobby(steamID);
-        else
-            Debug.Log("Failed to join lobby with ID: " + steamID.m_SteamID);
+        _fishySteamworks.SetClientAddress(steamID.m_SteamID.ToString());
+        _fishySteamworks.StartConnection(false);
+        
+        // FishySteamworks.FishySteamworks.
+        // FishySteamworks.FishySteamworks.StartConnection(false);
+        // SteamNetworkingIdentity smi = new SteamNetworkingIdentity();
+        // smi.SetSteamID(steamID);
+        // SteamNetworkingConfigValue_t[] options = new SteamNetworkingConfigValue_t[] { };
+        // SteamNetworkingSockets.ConnectP2P(ref smi, 0, options.Length, options);
+        
+        // Debug.Log("Attempting to join lobby with ID: " + steamID.m_SteamID);
+        // if (SteamMatchmaking.RequestLobbyData(steamID))
+        //     SteamMatchmaking.JoinLobby(steamID);
+        // else
+        //     Debug.Log("Failed to join lobby with ID: " + steamID.m_SteamID);
     }
  
     public static void LeaveLobby()
@@ -140,11 +165,18 @@ public class test : MonoBehaviour
   
         m_ServerListRequest = SteamMatchmakingServers.RequestSpectatorServerList(sb.settings.applicationId, null, 0, m_ServerListResponse);
     }
-    
-    
+
+    private void Update()
+    {
+        Debug.Log(SteamGameServer.GetSteamID());
+    }
+
+
     // ISteamMatchmakingServerListResponse
     private void OnServerResponded(HServerListRequest hRequest, int iServer) {
         Debug.Log("OnServerResponded: " + hRequest + " - " + iServer);
+        var handler = SteamMatchmakingServers.GetServerDetails(hRequest, iServer);
+        
     }
 
     private void OnServerFailedToRespond(HServerListRequest hRequest, int iServer) {

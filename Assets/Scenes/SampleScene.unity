@@ -619,8 +619,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 883275384}
-  - component: {fileID: 883275385}
   - component: {fileID: 883275386}
+  - component: {fileID: 883275387}
   m_Layer: 0
   m_Name: test
   m_TagString: Untagged
@@ -643,37 +643,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &883275385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 883275383}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4882e1f0baaa18a45836edebb1e6b881, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  settings: {fileID: 11400000, guid: ef82f3dda6601a948840640f3f8cb3a7, type: 2}
-  evtSteamInitialized:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 883275386}
-        m_TargetAssemblyTypeName: test, Assembly-CSharp
-        m_MethodName: OnSteamInit
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  evtSteamInitializationError:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &883275386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -688,6 +657,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _networkManager: {fileID: 7443408888293908493}
   _fishySteamworks: {fileID: 7443408888293908495}
+  settings: {fileID: 11400000, guid: ef82f3dda6601a948840640f3f8cb3a7, type: 2}
+--- !u!114 &883275387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883275383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef4bffeda13d7a748973ff9204401c07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -2088,6 +2070,7 @@ GameObject:
   - component: {fileID: 7443408888293908483}
   - component: {fileID: 7443408888293908495}
   - component: {fileID: 7443408888293908496}
+  - component: {fileID: 7443408888293908497}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -2145,7 +2128,7 @@ MonoBehaviour:
   _serverBindAddress: 
   _port: 7770
   _maximumClients: 9001
-  _peerToPeer: 1
+  _peerToPeer: 0
   _clientAddress: 
 --- !u!114 &7443408888293908496
 MonoBehaviour:
@@ -2167,6 +2150,32 @@ MonoBehaviour:
     _latency: 0
     _outOfOrder: 0
     _packetLoss: 0
+--- !u!114 &7443408888293908497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7443408888293908492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68828c85278210948b9d50a8db3aab74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _authenticator: {fileID: 0}
+  _remoteClientTimeout: 2
+  _remoteClientTimeoutDuration: 60
+  _allowPredictedSpawning: 0
+  _reservedObjectIds: 15
+  _syncTypeRate: 0.1
+  SpawnPacking:
+    Position: 0
+    Rotation: 2
+    Scale: 2
+  _changeFrameRate: 1
+  _frameRate: 500
+  _shareIds: 1
+  _startOnHeadless: 0
 --- !u!222 &7515190914968287927
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using FishNet.Managing;
+using HeathenEngineering.SteamworksIntegration;
+using HeathenEngineering.SteamworksIntegration.API;
 using Steamworks;
 using UnityEngine;
 
@@ -19,6 +21,10 @@ public class test : MonoBehaviour
     protected Callback<GameLobbyJoinRequested_t> JoinRequest;
     protected Callback<LobbyEnter_t> LobbyEntered;
     
+    private HServerListRequest m_ServerListRequest;
+    
+    private ISteamMatchmakingServerListResponse m_ServerListResponse;
+    
     public static ulong CurrentLobbyID;
     
     public void OnSteamInit()
@@ -31,6 +37,10 @@ public class test : MonoBehaviour
         LobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         JoinRequest = Callback<GameLobbyJoinRequested_t>.Create(OnJoinRequest);
         LobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
+        
+        m_ServerListRequest = HServerListRequest.Invalid;
+        
+        m_ServerListResponse = new ISteamMatchmakingServerListResponse(OnServerResponded, OnServerFailedToRespond, OnRefreshComplete);
     }
     
     private void OnLobbyCreated(LobbyCreated_t callback)
@@ -73,6 +83,7 @@ public class test : MonoBehaviour
     public static void CreateLobby()
     {
         SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, 4);
+      
     }
 
     public void JoinByID(string id)
@@ -98,5 +109,49 @@ public class test : MonoBehaviour
         instance._fishySteamworks.StopConnection(false);
         if(instance._networkManager.IsServer)
             instance._fishySteamworks.StopConnection(true);
+    }
+
+
+    public void SearchServerList()
+    {
+        var sb = GetComponent<SteamworksBehaviour>();
+       // MatchMakingKeyValuePair_t[] filters = new MatchMakingKeyValuePair_t[sb.settings.server.Configuration.rulePairs.Length];
+        
+        // var i = 0;
+        // foreach (var pair in sb.settings.server.Configuration.rulePairs)
+        // {
+        //     
+        //     
+        //     filters[i] = new MatchMakingKeyValuePair_t
+        //     {
+        //         m_szKey = pair.key, m_szValue = pair.value
+        //     };
+        //
+        //     ++i;
+        // }\
+        // sb.settings.server.Configuration
+        
+        //sb.settings.server.Configuration
+        MatchMakingKeyValuePair_t[] filters = {
+            new MatchMakingKeyValuePair_t { m_szKey = "spectatorServerName", m_szValue = sb.settings.server.Configuration.spectatorServerName },
+            new MatchMakingKeyValuePair_t { m_szKey = "gamedir", m_szValue = "tf" },
+            new MatchMakingKeyValuePair_t { m_szKey = "gametagsand", m_szValue = "beta" },
+        };
+  
+        m_ServerListRequest = SteamMatchmakingServers.RequestSpectatorServerList(sb.settings.applicationId, null, 0, m_ServerListResponse);
+    }
+    
+    
+    // ISteamMatchmakingServerListResponse
+    private void OnServerResponded(HServerListRequest hRequest, int iServer) {
+        Debug.Log("OnServerResponded: " + hRequest + " - " + iServer);
+    }
+
+    private void OnServerFailedToRespond(HServerListRequest hRequest, int iServer) {
+        Debug.Log("OnServerFailedToRespond: " + hRequest + " - " + iServer);
+    }
+
+    private void OnRefreshComplete(HServerListRequest hRequest, EMatchMakingServerResponse response) {
+        Debug.Log("OnRefreshComplete: " + hRequest + " - " + response);
     }
 }

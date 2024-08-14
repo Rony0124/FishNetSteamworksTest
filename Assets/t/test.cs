@@ -88,17 +88,23 @@ public class test : MonoBehaviour
 
     public void JoinByID(string id)
     {
-        CSteamID steamID = new CSteamID(Convert.ToUInt64(id));
-        JoinByID(steamID);
+        _fishySteamworks.SetClientAddress(id);
+        _fishySteamworks.StartConnection(false);
+        
+        // CSteamID steamID = new CSteamID(Convert.ToUInt64(id));
+        // JoinByID(steamID);
     }
     
-    public static void JoinByID(CSteamID steamID)
+    public void JoinByID(CSteamID steamID)
     {
-        Debug.Log("Attempting to join lobby with ID: " + steamID.m_SteamID);
-        if (SteamMatchmaking.RequestLobbyData(steamID))
-            SteamMatchmaking.JoinLobby(steamID);
-        else
-            Debug.Log("Failed to join lobby with ID: " + steamID.m_SteamID);
+        _fishySteamworks.SetClientAddress(steamID.ToString());
+        _fishySteamworks.StartConnection(false);
+        
+        // Debug.Log("Attempting to join lobby with ID: " + steamID.m_SteamID);
+        // if (SteamMatchmaking.RequestLobbyData(steamID))
+        //     SteamMatchmaking.JoinLobby(steamID);
+        // else
+        //     Debug.Log("Failed to join lobby with ID: " + steamID.m_SteamID);
     }
  
     public static void LeaveLobby()
